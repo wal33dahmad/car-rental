@@ -1,21 +1,43 @@
 import { data } from "@/data";
+import { FilterProps } from "@/types";
 
-export async function fetchCars() {
-  const headers = {
-    "X-RapidAPI-Key": "5aa453a667msh68ded69418e7b18p195bb1jsn6e9c4981d6d5",
-    "X-RapidAPI-Host": "cars-by-api-ninjas.p.rapidapi.com",
-  };
+export async function fetchCars(filters: FilterProps) {
+  const { manufacturer, model, year, fuel, limit } = filters;
 
+  // const headers = {
+  //   "X-RapidAPI-Key": "5aa453a667msh68ded69418e7b18p195bb1jsn6e9c4981d6d5",
+  //   "X-RapidAPI-Host": "cars-by-api-ninjas.p.rapidapi.com",
+  // };
   // const response = await fetch(
-  //   `https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?model=corolla`,
+  //   `https://cars-by-api-ninjas.p.rapidapi.com/v1/cars?make=${manufacturer}&model=${model}&year=${year}&fuel_type=${fuel}&limit=${limit}`,
   //   {
   //     headers,
   //   }
   // );
-
   // const result = await response.json();
+  // console.log(result);
 
-  const result = data;
+  // workaround to use without api. only works for toyota corolla & porsche 911
+  const filteredData = data.filter((car) => {
+    const match = [];
+
+    if (manufacturer) {
+      match.push(car.make.toLowerCase().includes(manufacturer.toLowerCase()));
+    }
+    if (model) {
+      match.push(car.model.toLowerCase().includes(model.toLowerCase()));
+    }
+    if (year) {
+      match.push(car.year === year);
+    }
+    if (fuel) {
+      match.push(car.fuel_type.toLowerCase().includes(fuel.toLowerCase()));
+    }
+
+    return match.some(Boolean);
+  });
+
+  const result = filteredData.slice(0, limit);
 
   return result;
 }
